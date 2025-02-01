@@ -1,0 +1,328 @@
+    <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonics Learning Game</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-image: url('https://i.imgur.com/3QmL5ZC.jpg'); /* Playful background */
+            background-size: cover;
+            background-position: center;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .game-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        .letter-box {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #FF5722;
+            animation: bounceIn 1s ease-in-out;
+        }
+        .phonetic-symbol {
+            font-size: 1.5em;
+            color: #3F51B5;
+            margin-top: 10px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .option-button {
+            background-color: #FFC107;
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.5em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        .option-button:hover {
+            background-color: #FFA000;
+            transform: scale(1.1);
+        }
+        .option-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .feedback {
+            font-size: 1.5em;
+            margin-top: 20px;
+            position: relative;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .correct {
+            color: #4CAF50;
+        }
+        .wrong {
+            color: #f44336;
+        }
+        .feedback img {
+            width: 100px;
+            height: auto;
+            margin-top: 10px;
+        }
+        button#next-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button#next-btn:hover {
+            background-color: #1976D2;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .team {
+            text-align: center;
+        }
+        .team img {
+            width: 50px;
+            height: auto;
+            margin-bottom: 5px;
+        }
+        .team h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #3F51B5;
+        }
+        .team p {
+            font-size: 2em;
+            font-weight: bold;
+            color: #FF5722;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Phonics Adventure!</h1>
+    <div class="scoreboard">
+        <div class="team" id="team1">
+            <img src="https://i.imgur.com/7vQ5kRz.png" alt="Team 1 Icon"> <!-- Team 1 icon -->
+            <h2>Team 1</h2>
+            <p id="team1-score">0</p>
+        </div>
+        <div class="team" id="team2">
+            <img src="https://i.imgur.com/9mVZ8Jd.png" alt="Team 2 Icon"> <!-- Team 2 icon -->
+            <h2>Team 2</h2>
+            <p id="team2-score">0</p>
+        </div>
+    </div>
+    <div class="game-container">
+        <div class="letter-box" id="letter-box">A</div>
+        <div class="phonetic-symbol" id="phonetic-symbol">/æ/</div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+        <button id="next-btn" style="display:none;" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <!-- Audio Files -->
+    <audio id="correct-sound" src="https://www.soundjay.com/button/success-02.mp3"></audio>
+    <audio id="wrong-sound" src="https://www.soundjay.com/misc/sounds/fail-trombone-01.mp3"></audio>
+    <audio id="letter-sound" src=""></audio>
+    <audio id="cheering-sound" src="https://www.soundjay.com/human/sounds/applause-01.mp3"></audio>
+
+    <script>
+        const letters = [
+            { letter: "A", symbol: "/æ/", sound: "https://www.soundjay.com/voice/sounds/a-1.mp3", example: "Apple", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "B", symbol: "/b/", sound: "https://www.soundjay.com/voice/sounds/b-1.mp3", example: "Ball", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "C", symbol: "/k/", sound: "https://www.soundjay.com/voice/sounds/c-1.mp3", example: "Cat", image: "https://i.imgur.com/6xgWlLw.png" },
+            { letter: "D", symbol: "/d/", sound: "https://www.soundjay.com/voice/sounds/d-1.mp3", example: "Dog", image: "https://i.imgur.com/7vQ5kRz.png" },
+            { letter: "E", symbol: "/ɛ/", sound: "https://www.soundjay.com/voice/sounds/e-1.mp3", example: "Elephant", image: "https://i.imgur.com/9mVZ8Jd.png" },
+            { letter: "F", symbol: "/f/", sound: "https://www.soundjay.com/voice/sounds/f-1.mp3", example: "Fish", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "G", symbol: "/ɡ/", sound: "https://www.soundjay.com/voice/sounds/g-1.mp3", example: "Goat", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "H", symbol: "/h/", sound: "https://www.soundjay.com/voice/sounds/h-1.mp3", example: "Hat", image: "https://i.imgur.com/6xgWlLw.png" },
+            { letter: "I", symbol: "/ɪ/", sound: "https://www.soundjay.com/voice/sounds/i-1.mp3", example: "Igloo", image: "https://i.imgur.com/7vQ5kRz.png" },
+            { letter: "J", symbol: "/dʒ/", sound: "https://www.soundjay.com/voice/sounds/j-1.mp3", example: "Jump", image: "https://i.imgur.com/9mVZ8Jd.png" },
+            { letter: "K", symbol: "/k/", sound: "https://www.soundjay.com/voice/sounds/k-1.mp3", example: "Kite", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "L", symbol: "/l/", sound: "https://www.soundjay.com/voice/sounds/l-1.mp3", example: "Lion", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "M", symbol: "/m/", sound: "https://www.soundjay.com/voice/sounds/m-1.mp3", example: "Monkey", image: "https://i.imgur.com/6xgWlLw.png" },
+            { letter: "N", symbol: "/n/", sound: "https://www.soundjay.com/voice/sounds/n-1.mp3", example: "Nest", image: "https://i.imgur.com/7vQ5kRz.png" },
+            { letter: "O", symbol: "/ɒ/", sound: "https://www.soundjay.com/voice/sounds/o-1.mp3", example: "Orange", image: "https://i.imgur.com/9mVZ8Jd.png" },
+            { letter: "P", symbol: "/p/", sound: "https://www.soundjay.com/voice/sounds/p-1.mp3", example: "Pig", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "Q", symbol: "/kw/", sound: "https://www.soundjay.com/voice/sounds/q-1.mp3", example: "Queen", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "R", symbol: "/r/", sound: "https://www.soundjay.com/voice/sounds/r-1.mp3", example: "Rabbit", image: "https://i.imgur.com/6xgWlLw.png" },
+            { letter: "S", symbol: "/s/", sound: "https://www.soundjay.com/voice/sounds/s-1.mp3", example: "Snake", image: "https://i.imgur.com/7vQ5kRz.png" },
+            { letter: "T", symbol: "/t/", sound: "https://www.soundjay.com/voice/sounds/t-1.mp3", example: "Tiger", image: "https://i.imgur.com/9mVZ8Jd.png" },
+            { letter: "U", symbol: "/ʌ/", sound: "https://www.soundjay.com/voice/sounds/u-1.mp3", example: "Umbrella", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "V", symbol: "/v/", sound: "https://www.soundjay.com/voice/sounds/v-1.mp3", example: "Van", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "W", symbol: "/w/", sound: "https://www.soundjay.com/voice/sounds/w-1.mp3", example: "Whale", image: "https://i.imgur.com/6xgWlLw.png" },
+            { letter: "X", symbol: "/ks/", sound: "https://www.soundjay.com/voice/sounds/x-1.mp3", example: "Box", image: "https://i.imgur.com/7vQ5kRz.png" },
+            { letter: "Y", symbol: "/j/", sound: "https://www.soundjay.com/voice/sounds/y-1.mp3", example: "Yellow", image: "https://i.imgur.com/9mVZ8Jd.png" },
+            { letter: "Z", symbol: "/z/", sound: "https://www.soundjay.com/voice/sounds/z-1.mp3", example: "Zebra", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "CH", symbol: "/tʃ/", sound: "https://www.soundjay.com/voice/sounds/ch-1.mp3", example: "Chair", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "SH", symbol: "/ʃ/", sound: "https://www.soundjay.com/voice/sounds/sh-1.mp3", example: "Ship", image: "https://i.imgur.com/6xgWlLw.png" },
+            { letter: "TH (voiced)", symbol: "/ð/", sound: "https://www.soundjay.com/voice/sounds/th-voiced-1.mp3", example: "This", image: "https://i.imgur.com/7vQ5kRz.png" },
+            { letter: "TH (unvoiced)", symbol: "/θ/", sound: "https://www.soundjay.com/voice/sounds/th-unvoiced-1.mp3", example: "Think", image: "https://i.imgur.com/9mVZ8Jd.png" },
+            { letter: "NG", symbol: "/ŋ/", sound: "https://www.soundjay.com/voice/sounds/ng-1.mp3", example: "Ring", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "OO (short)", symbol: "/ʊ/", sound: "https://www.soundjay.com/voice/sounds/oo-short-1.mp3", example: "Book", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "OO (long)", symbol: "/uː/", sound: "https://www.soundjay.com/voice/sounds/oo-long-1.mp3", example: "Moon", image: "https://i.imgur.com/6xgWlLw.png" },
+            { letter: "AI", symbol: "/eɪ/", sound: "https://www.soundjay.com/voice/sounds/ai-1.mp3", example: "Rain", image: "https://i.imgur.com/7vQ5kRz.png" },
+            { letter: "AY", symbol: "/eɪ/", sound: "https://www.soundjay.com/voice/sounds/ay-1.mp3", example: "Play", image: "https://i.imgur.com/9mVZ8Jd.png" },
+            { letter: "OI", symbol: "/ɔɪ/", sound: "https://www.soundjay.com/voice/sounds/oi-1.mp3", example: "Boil", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "OW", symbol: "/aʊ/", sound: "https://www.soundjay.com/voice/sounds/ow-1.mp3", example: "Cow", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "OU", symbol: "/aʊ/", sound: "https://www.soundjay.com/voice/sounds/ou-1.mp3", example: "House", image: "https://i.imgur.com/6xgWlLw.png" },
+            { letter: "AW", symbol: "/ɔː/", sound: "https://www.soundjay.com/voice/sounds/aw-1.mp3", example: "Saw", image: "https://i.imgur.com/7vQ5kRz.png" },
+            { letter: "ER", symbol: "/ɜːr/", sound: "https://www.soundjay.com/voice/sounds/er-1.mp3", example: "Her", image: "https://i.imgur.com/9mVZ8Jd.png" },
+            { letter: "UR", symbol: "/ɜːr/", sound: "https://www.soundjay.com/voice/sounds/ur-1.mp3", example: "Turn", image: "https://i.imgur.com/4QK3TnO.png" },
+            { letter: "AR", symbol: "/ɑːr/", sound: "https://www.soundjay.com/voice/sounds/ar-1.mp3", example: "Car", image: "https://i.imgur.com/8yY1cJz.png" },
+            { letter: "OR", symbol: "/ɔːr/", sound: "https://www.soundjay.com/voice/sounds/or-1.mp3", example: "For", image: "https://i.imgur.com/6xgWlLw.png" }
+        ];
+
+        let currentQuestion = null;
+        let currentTeam = 1; // Start with Team 1
+        let teamScores = { team1: 0, team2: 0 };
+
+        function getRandomOptions(correctAnswer) {
+            const options = [correctAnswer];
+            while (options.length < 2) {
+                const randomOption = letters[Math.floor(Math.random() * letters.length)].example;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        function loadQuestion() {
+            document.getElementById('feedback').innerHTML = ''; // Clear feedback and images
+            document.getElementById('next-btn').style.display = 'none';
+
+            const question = letters[Math.floor(Math.random() * letters.length)];
+            currentQuestion = question;
+
+            document.getElementById('letter-box').textContent = question.letter;
+            document.getElementById('phonetic-symbol').textContent = question.symbol;
+
+            // Play the letter sound
+            const letterSound = document.getElementById('letter-sound');
+            letterSound.src = question.sound;
+            letterSound.play();
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            const options = getRandomOptions(question.example);
+
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => handleAnswer(button, option);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function handleAnswer(clickedButton, selectedOption) {
+            // Disable all buttons to prevent further clicks
+            const buttons = document.querySelectorAll('.option-button');
+            buttons.forEach(button => button.disabled = true);
+
+            const feedback = document.getElementById('feedback');
+            if (selectedOption === currentQuestion.example) {
+                feedback.innerHTML = `
+                    <p class="correct">Correct!</p>
+                    <img src="https://i.imgur.com/7vQ5kRz.gif" alt="Correct GIF"> <!-- Correct GIF -->
+                `;
+                document.getElementById('correct-sound').play();
+                document.getElementById('cheering-sound').play();
+
+                // Update score for the current team
+                teamScores[`team${currentTeam}`]++;
+                updateScoreboard();
+            } else {
+                feedback.innerHTML = `
+                    <p class="wrong">Wrong! The correct answer is ${currentQuestion.example}.</p>
+                    <img src="https://i.imgur.com/9mVZ8Jd.gif" alt="Wrong GIF"> <!-- Wrong GIF -->
+                `;
+                document.getElementById('wrong-sound').play();
+            }
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            // Switch teams after each question
+            currentTeam = currentTeam === 1 ? 2 : 1;
+            loadQuestion();
+        }
+
+        function updateScoreboard() {
+            document.getElementById('team1-score').textContent = teamScores.team1;
+            document.getElementById('team2-score').textContent = teamScores.team2;
+        }
+
+        window.onload = loadQuestion;
+    </script>
+
+</body>
+</html>
+
+
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
