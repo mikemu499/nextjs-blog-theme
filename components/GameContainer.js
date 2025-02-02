@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const letters = [
     { letter: "A", symbol: "/æ/", sound: "https://www.soundjay.com/voice/sounds/a-1.mp3", example: "Apple", image: "/images/apple.png" },
@@ -37,18 +38,28 @@ export default function GameContainer() {
 
         if (selectedOption === currentQuestion.example) {
             setFeedback(
-                <div className="flex flex-col items-center">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-col items-center"
+                >
                     <p className="text-2xl text-green-500 font-bold">Correct!</p>
                     <img src="/images/correct.gif" alt="Correct GIF" className="w-24 mt-4" />
-                </div>
+                </motion.div>
             );
             setTeamScores(prev => ({ ...prev, [`team${currentTeam}`]: prev[`team${currentTeam}`] + 1 }));
         } else {
             setFeedback(
-                <div className="flex flex-col items-center">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-col items-center"
+                >
                     <p className="text-2xl text-red-500 font-bold">Wrong! The correct answer is {currentQuestion.example}.</p>
                     <img src="/images/wrong.gif" alt="Wrong GIF" className="w-24 mt-4" />
-                </div>
+                </motion.div>
             );
         }
         setShowNextButton(true);
@@ -60,35 +71,69 @@ export default function GameContainer() {
     };
 
     return (
-        <div className="bg-white bg-opacity-90 rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-            <div className="text-6xl font-bold text-orange-500 mb-4">{currentQuestion?.letter}</div>
+        <motion.div
+            className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 w-full max-w-md text-center"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+        >
+            {/* Letter Box */}
+            <motion.div
+                className="text-7xl font-bold text-orange-500 mb-6 drop-shadow-md"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 100 }}
+            >
+                {currentQuestion?.letter}
+            </motion.div>
+
+            {/* Phonetic Symbol */}
             <div className="text-xl text-blue-500 mb-4">{currentQuestion?.symbol}</div>
+
+            {/* Image */}
             {currentQuestion && (
-                <img src={currentQuestion.image} alt={currentQuestion.example} className="w-36 h-auto mx-auto mb-4" />
+                <motion.img
+                    src={currentQuestion.image}
+                    alt={currentQuestion.example}
+                    className="w-40 h-auto mx-auto mb-6"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                />
             )}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+
+            {/* Options */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
                 {currentQuestion &&
                     getRandomOptions(currentQuestion.example).map((option, index) => (
-                        <button
+                        <motion.button
                             key={index}
-                            className="bg-yellow-500 text-white text-xl font-bold py-4 px-6 rounded-lg shadow-md hover:bg-yellow-600 transition-transform duration-300 ease-in-out hover:scale-110 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            className="bg-yellow-500 text-white text-xl font-bold py-4 px-6 rounded-xl shadow-md hover:bg-yellow-600 transition-transform duration-300 ease-in-out hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed"
                             onClick={() => handleAnswer(option)}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                         >
                             {option}
-                        </button>
+                        </motion.button>
                     ))}
             </div>
+
+            {/* Feedback */}
             <div className="mt-4">{feedback}</div>
+
+            {/* Next Button */}
             {showNextButton && (
-                <button
+                <motion.button
                     id="next-btn"
                     onClick={nextQuestion}
-                    className="mt-4 bg-blue-500 text-white text-lg font-bold py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition-colors duration-300"
+                    className="mt-4 bg-blue-500 text-white text-lg font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition-colors duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                 >
                     Next Question
-                </button>
+                </motion.button>
             )}
-        </div>
+        </motion.div>
     );
 }
 
