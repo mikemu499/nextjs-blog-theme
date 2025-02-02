@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       {/* Add metadata for SEO */}
-      <Head>
+      <Head className="flex flex-col items-center justify-center">
         <title>Phonics Adventure</title>
         <meta name="description" content="A fun and interactive phonics learning game for preschoolers!" />
         <link rel="icon" href="/favicon.ico" />
