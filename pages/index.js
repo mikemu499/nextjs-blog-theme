@@ -1,7 +1,5 @@
 import Head from 'next/head';
 import dynamic from 'next/dynamic'; 
-import GameContainer from '../components/GameContainer';
-
 
 const GameContainer = dynamic(() => import('../components/GameContainer'), { ssr: false });
 export default function Home() {
