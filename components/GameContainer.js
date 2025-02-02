@@ -12,10 +12,12 @@ const letters = [
 
 // Team icons (fruits and animals)
 const teamIcons = [
-    { name: "Apple", image: "/images/apple.png" },
-    { name: "Banana", image: "/images/banana.png" },
+    { name: "Monkey", image: "/images/monkey.png" },
     { name: "Lion", image: "/images/lion.png" },
     { name: "Elephant", image: "/images/elephant.png" },
+    { name: "Tiger", image: "/images/tiger.png" },
+    { name: "Banana", image: "/images/banana.png" },
+    { name: "Apple", image: "/images/apple.png" },
     // Add more icons as needed...
 ];
 
@@ -94,108 +96,119 @@ export default function GameContainer() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/images/background.jpg')" }}>
-            {!isGameStarted ? (
-                <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
-                    <h2 className="text-3xl font-bold text-blue-500 mb-6">Choose Your Team Icons</h2>
-                    <div className="flex justify-between mb-6">
-                        <div>
-                            <h3 className="text-xl font-bold text-green-500 mb-2">Team 1</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                {teamIcons.map((icon, index) => (
-                                    <button
-                                        key={index}
-                                        className={`w-20 h-20 rounded-full overflow-hidden border-4 ${selectedIcons.team1 === icon.name ? 'border-green-500' : 'border-transparent'}`}
-                                        onClick={() => setSelectedIcons(prev => ({ ...prev, team1: icon.name }))}
-                                    >
-                                        <img src={icon.image} alt={icon.name} className="w-full h-full object-cover" />
-                                    </button>
-                                ))}
+            {/* Floating Team Selection Modal */}
+            {!isGameStarted && (
+                <motion.div
+                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                >
+                    <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
+                        <h2 className="text-3xl font-bold text-blue-500 mb-6">Choose Your Team Icons</h2>
+                        <div className="flex justify-between mb-6">
+                            <div>
+                                <h3 className="text-xl font-bold text-green-500 mb-2">Team 1</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {teamIcons.map((icon, index) => (
+                                        <button
+                                            key={index}
+                                            className={`w-20 h-20 rounded-full overflow-hidden border-4 ${selectedIcons.team1 === icon.name ? 'border-green-500' : 'border-transparent'}`}
+                                            onClick={() => setSelectedIcons(prev => ({ ...prev, team1: icon.name }))}
+                                        >
+                                            <img src={icon.image} alt={icon.name} className="w-full h-full object-cover" />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-red-500 mb-2">Team 2</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {teamIcons.map((icon, index) => (
+                                        <button
+                                            key={index}
+                                            className={`w-20 h-20 rounded-full overflow-hidden border-4 ${selectedIcons.team2 === icon.name ? 'border-red-500' : 'border-transparent'}`}
+                                            onClick={() => setSelectedIcons(prev => ({ ...prev, team2: icon.name }))}
+                                        >
+                                            <img src={icon.image} alt={icon.name} className="w-full h-full object-cover" />
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-red-500 mb-2">Team 2</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                {teamIcons.map((icon, index) => (
-                                    <button
-                                        key={index}
-                                        className={`w-20 h-20 rounded-full overflow-hidden border-4 ${selectedIcons.team2 === icon.name ? 'border-red-500' : 'border-transparent'}`}
-                                        onClick={() => setSelectedIcons(prev => ({ ...prev, team2: icon.name }))}
-                                    >
-                                        <img src={icon.image} alt={icon.name} className="w-full h-full object-cover" />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                        <button
+                            className="bg-blue-500 text-white text-lg font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition-colors duration-300"
+                            onClick={startGame}
+                        >
+                            Start Game
+                        </button>
                     </div>
-                    <button
-                        className="bg-blue-500 text-white text-lg font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition-colors duration-300"
-                        onClick={startGame}
-                    >
-                        Start Game
-                    </button>
-                </div>
-            ) : (
-                <div className="relative bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
+                </motion.div>
+            )}
+
+            {/* Main Game Layout */}
+            {isGameStarted && (
+                <div className="relative flex flex-col items-center justify-center w-full h-full">
                     {/* Team Icons and Scores */}
-                    <div className="flex justify-between items-center mb-6">
-                        <div className="flex flex-col items-center">
-                            <img src={teamIcons.find(icon => icon.name === selectedIcons.team1)?.image} alt="Team 1 Icon" className="w-16 h-16 rounded-full mb-2" />
-                            <p className="text-xl font-bold text-green-500">Team 1</p>
-                            <p className="text-2xl font-bold text-orange-500">{teamScores.team1}</p>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <img src={teamIcons.find(icon => icon.name === selectedIcons.team2)?.image} alt="Team 2 Icon" className="w-16 h-16 rounded-full mb-2" />
-                            <p className="text-xl font-bold text-red-500">Team 2</p>
-                            <p className="text-2xl font-bold text-orange-500">{teamScores.team2}</p>
-                        </div>
+                    <div className="absolute top-4 left-4 flex flex-col items-center">
+                        <img src={teamIcons.find(icon => icon.name === selectedIcons.team1)?.image} alt="Team 1 Icon" className="w-20 h-20 rounded-full mb-2" />
+                        <p className="text-xl font-bold text-green-500">Team 1</p>
+                        <p className="text-2xl font-bold text-orange-500">{teamScores.team1}</p>
+                    </div>
+                    <div className="absolute top-4 right-4 flex flex-col items-center">
+                        <img src={teamIcons.find(icon => icon.name === selectedIcons.team2)?.image} alt="Team 2 Icon" className="w-20 h-20 rounded-full mb-2" />
+                        <p className="text-xl font-bold text-red-500">Team 2</p>
+                        <p className="text-2xl font-bold text-orange-500">{teamScores.team2}</p>
                     </div>
 
                     {/* Game Content */}
-                    <motion.div
-                        className="text-7xl font-bold text-orange-500 mb-6 drop-shadow-md"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 100 }}
-                    >
-                        {currentQuestion?.letter}
-                    </motion.div>
-                    <div className="text-xl text-blue-500 mb-4">{currentQuestion?.symbol}</div>
-                    {currentQuestion && (
-                        <motion.img
-                            src={currentQuestion.image}
-                            alt={currentQuestion.example}
-                            className="w-40 h-auto mx-auto mb-6"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                        />
-                    )}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                        {currentQuestion &&
-                            getRandomOptions(currentQuestion.example).map((option, index) => (
-                                <motion.button
-                                    key={index}
-                                    className="bg-yellow-500 text-white text-xl font-bold py-4 px-6 rounded-xl shadow-md hover:bg-yellow-600 transition-transform duration-300 ease-in-out hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                                    onClick={() => handleAnswer(option)}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    {option}
-                                </motion.button>
-                            ))}
-                    </div>
-                    <div className="mt-4">{feedback}</div>
-                    {showNextButton && (
-                        <motion.button
-                            id="next-btn"
-                            onClick={nextQuestion}
-                            className="mt-4 bg-blue-500 text-white text-lg font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition-colors duration-300"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                    <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 w-full max-w-2xl h-[80vh] overflow-y-auto text-center">
+                        <motion.div
+                            className="text-7xl font-bold text-orange-500 mb-6 drop-shadow-md"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring', stiffness: 100 }}
                         >
-                            Next Question
-                        </motion.button>
-                    )}
+                            {currentQuestion?.letter}
+                        </motion.div>
+                        <div className="text-xl text-blue-500 mb-4">{currentQuestion?.symbol}</div>
+                        {currentQuestion && (
+                            <motion.img
+                                src={currentQuestion.image}
+                                alt={currentQuestion.example}
+                                className="w-40 h-auto mx-auto mb-6"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                            />
+                        )}
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            {currentQuestion &&
+                                getRandomOptions(currentQuestion.example).map((option, index) => (
+                                    <motion.button
+                                        key={index}
+                                        className="bg-yellow-500 text-white text-xl font-bold py-4 px-6 rounded-xl shadow-md hover:bg-yellow-600 transition-transform duration-300 ease-in-out hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                        onClick={() => handleAnswer(option)}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        {option}
+                                    </motion.button>
+                                ))}
+                        </div>
+                        <div className="mt-4">{feedback}</div>
+                        {showNextButton && (
+                            <motion.button
+                                id="next-btn"
+                                onClick={nextQuestion}
+                                className="mt-4 bg-blue-500 text-white text-lg font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition-colors duration-300"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                Next Question
+                            </motion.button>
+                        )}
+                    </div>
                 </div>
             )}
         </div>
