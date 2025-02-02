@@ -26,7 +26,9 @@ export default function GameContainer() {
         // Play the sound only on the client side
         if (typeof window !== 'undefined') {
             const audio = new Audio(question.sound);
-            audio.play();
+            audio.play().catch((error) => {
+                console.error("Audio playback failed:", error);
+            });
         }
     };
 
