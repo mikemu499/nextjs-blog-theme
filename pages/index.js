@@ -13,7 +13,7 @@ export default function Home() {
       </Head>
 
       {/* Main Game Content */}
-    div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/images/background.jpg')" }}>
+   <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/images/background.jpg')" }}>
             <h1 className="text-5xl font-bold text-green-500 mb-8 drop-shadow-lg">Phonics Adventure!</h1>
             <GameContainer />
         </div>
