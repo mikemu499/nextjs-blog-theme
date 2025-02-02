@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const letters = [
     { letter: "A", symbol: "/æ/", sound: "https://www.soundjay.com/voice/sounds/a-1.mp3", example: "Apple", image: "/images/apple.png" },
@@ -13,14 +13,21 @@ export default function GameContainer() {
     const [feedback, setFeedback] = useState('');
     const [showNextButton, setShowNextButton] = useState(false);
 
+    useEffect(() => {
+        loadQuestion();
+    }, []); // Run once on component mount
+
     const loadQuestion = () => {
         const question = letters[Math.floor(Math.random() * letters.length)];
         setCurrentQuestion(question);
         setFeedback('');
         setShowNextButton(false);
 
-        const audio = new Audio(question.sound);
-        audio.play();
+        // Play the sound only on the client side
+        if (typeof window !== 'undefined') {
+            const audio = new Audio(question.sound);
+            audio.play();
+        }
     };
 
     const handleAnswer = (selectedOption) => {
@@ -50,10 +57,6 @@ export default function GameContainer() {
         setCurrentTeam(currentTeam === 1 ? 2 : 1);
         loadQuestion();
     };
-
-    if (!currentQuestion) {
-        loadQuestion();
-    }
 
     return (
         <div className="game-container">
