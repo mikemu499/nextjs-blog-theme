@@ -35,7 +35,7 @@
     "framer-motion": "^10.0.0",
     "use-sound":"^4.0.0",
     "canvas-confetti": "^1.6.0",
-    "node-sass":"^4.11.0"
+    "sass": "^1.49.9"
   },
   "devDependencies": {
     "@stackbit/cms-git": "^1.0.32",
