@@ -17,6 +17,10 @@ export default function Home() {
   const [playWrong] = useSound('/sounds/wrong.mp3');
   const [playVictory] = useSound('/sounds/victory.mp3');
 
+  // Avatars from different categories
+  const animalAvatars = ['🦁', '🐱', '🐶', '🐵', '🦄', '🐯', '🐻', '🐼', '🐨', '🐷'];
+  const fruitAvatars = ['🍎', '🍌', '🍇', '🍉', '🍒', '🍊', '🍓', '🍍', '🍑', '🍋'];
+
   // Game state
   const [teams, setTeams] = useState({
     A: { name: 'Apples', avatar: '🍎', score: 0 },
@@ -72,7 +76,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-50">
       {!currentGame ? (
-        <TeamSetup onStart={handleGameStart} />
+        <TeamSetup 
+          onStart={handleGameStart} 
+          animalAvatars={animalAvatars} 
+          fruitAvatars={fruitAvatars} 
+        />
       ) : (
         <div className="flex flex-col md:flex-row min-h-screen">
           {/* Left Team */}

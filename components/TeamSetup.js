@@ -2,16 +2,31 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
-const avatars = ['🐶', '🐱', '🦁', '🐯', '🐻', '🐼', '🐨', '🦄'];
+// Define avatars in two categories
+const animalAvatars = ['🐶', '🐱', '🦁', '🐯', '🐻', '🐼', '🐨', '🦄'];
+const fruitAvatars = ['🍎', '🍌', '🍓', '🍍', '🍊', '🍉', '🍇', '🍒'];
 
 export default function TeamSetup({ onStart }) {
   const [teams, setTeams] = useState({
-    A: { name: 'Apples', avatar: '🍎' },
-    B: { name: 'Bananas', avatar: '🍌' }
+    A: { name: 'Apples', avatar: '🍎', category: 'fruits' },
+    B: { name: 'Bananas', avatar: '🍌', category: 'fruits' }
   });
 
   const handleStart = () => {
     if (teams.A.name && teams.B.name) onStart(teams.A, teams.B);
+  };
+
+  // Handle category change for a team
+  const handleCategoryChange = (team, category) => {
+    setTeams(prev => ({
+      ...prev,
+      [team]: { ...prev[team], category, avatar: category === 'animals' ? animalAvatars[0] : fruitAvatars[0] }
+    }));
+  };
+
+  // Get avatars based on selected category
+  const getAvatars = (category) => {
+    return category === 'animals' ? animalAvatars : fruitAvatars;
   };
 
   return (
@@ -38,8 +53,23 @@ export default function TeamSetup({ onStart }) {
                 placeholder={`Team ${team} name`}
               />
               
+              {/* Category selection */}
+              <div className="mb-4">
+                <label htmlFor={`${team}-category`} className="block text-sm font-semibold">Choose Category:</label>
+                <select
+                  id={`${team}-category`}
+                  value={teams[team].category}
+                  onChange={(e) => handleCategoryChange(team, e.target.value)}
+                  className="w-full p-2 border rounded-lg mt-2"
+                >
+                  <option value="animals">Animals</option>
+                  <option value="fruits">Fruits</option>
+                </select>
+              </div>
+
+              {/* Avatar selection */}
               <div className="grid grid-cols-4 gap-2">
-                {avatars.map((avatar) => (
+                {getAvatars(teams[team].category).map((avatar) => (
                   <button
                     key={avatar}
                     onClick={() => setTeams(prev => ({
