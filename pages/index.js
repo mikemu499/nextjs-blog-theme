@@ -7,7 +7,7 @@ import ProgressBar from '../components/ProgressBar';
 import Confetti from '../components/Confetti';
 
 // Lazy load game component
-const LetterMatchGame = dynamic(() => import('@/components/LetterMatchGame'), {
+const LetterMatchGame = dynamic(() => import('../components/LetterMatchGame'), {
   loading: () => <p>Loading game...</p>,
 });
 
