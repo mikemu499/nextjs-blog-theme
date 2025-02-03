@@ -1,56 +1,72 @@
-// components/TeamSetup.js
 'use client';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 
-const avatars = ['🐶', '🐱', '🐯', '🦁', '🐮', '🐹'];
+const avatars = ['🐶', '🐱', '🦁', '🐯', '🐻', '🐼', '🐨', '🦄'];
 
-export default function TeamSetup({ onComplete }) {
-  const [teamA, setTeamA] = useState({ name: 'Apples', avatar: '🍎' });
-  const [teamB, setTeamB] = useState({ name: 'Bananas', avatar: '🍌' });
+export default function TeamSetup({ onStart }) {
+  const [teams, setTeams] = useState({
+    A: { name: 'Apples', avatar: '🍎' },
+    B: { name: 'Bananas', avatar: '🍌' }
+  });
+
+  const handleStart = () => {
+    if (teams.A.name && teams.B.name) onStart(teams.A, teams.B);
+  };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl">
-      <h2 className="text-2xl font-bold mb-6">Set Up Your Teams!</h2>
-      
-      <div className="grid grid-cols-2 gap-8">
-        {/* Team A Customization */}
-        <div className="space-y-4">
-          <label className="block">
-            <span className="text-gray-700">Team A Name:</span>
-            <input
-              type="text"
-              value={teamA.name}
-              onChange={(e) => setTeamA({ ...teamA, name: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-          </label>
-          <div>
-            <span className="text-gray-700">Choose Avatar:</span>
-            <div className="grid grid-cols-3 gap-2 mt-2">
-              {avatars.map((avatar) => (
-                <button
-                  key={avatar}
-                  onClick={() => setTeamA({ ...teamA, avatar })}
-                  className={`text-2xl p-2 rounded ${teamA.avatar === avatar ? 'bg-blue-200' : 'hover:bg-gray-100'}`}
-                >
-                  {avatar}
-                </button>
-              ))}
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full"
+      >
+        <h1 className="text-3xl font-bold text-center mb-8">Create Your Teams!</h1>
+        
+        <div className="grid md:grid-cols-2 gap-8">
+          {['A', 'B'].map((team) => (
+            <div key={team} className="space-y-4">
+              <h2 className="text-xl font-semibold">Team {team}</h2>
+              <input
+                type="text"
+                value={teams[team].name}
+                onChange={(e) => setTeams(prev => ({
+                  ...prev,
+                  [team]: { ...prev[team], name: e.target.value }
+                }))}
+                className="w-full p-2 border rounded-lg"
+                placeholder={`Team ${team} name`}
+              />
+              
+              <div className="grid grid-cols-4 gap-2">
+                {avatars.map((avatar) => (
+                  <button
+                    key={avatar}
+                    onClick={() => setTeams(prev => ({
+                      ...prev,
+                      [team]: { ...prev[team], avatar }
+                    }))}
+                    className={`text-2xl p-2 rounded-lg transition-all ${
+                      teams[team].avatar === avatar 
+                        ? 'bg-purple-500 text-white' 
+                        : 'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    {avatar}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* Team B Customization (similar structure) */}
-        {/* ... */}
-
-      </div>
-
-      <button
-        onClick={() => onComplete(teamA, teamB)}
-        className="mt-6 bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
-      >
-        Start Game!
-      </button>
+        <button
+          onClick={handleStart}
+          className="mt-8 w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-all"
+        >
+          Start Game!
+        </button>
+      </motion.div>
     </div>
   );
 }
