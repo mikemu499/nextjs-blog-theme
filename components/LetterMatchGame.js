@@ -8,7 +8,16 @@ const phonicsPairs = [
     correctImage: '/images/apple.png',
     options: ['/images/apple.png', '/images/ball.png', '/images/cat.png']
   },
-  // Add more pairs...
+  {
+    letter: 'M',
+    correctImage: '/images/monkey.png',
+    options: ['/images/apple.png', '/images/banana.png', '/images/lion.png']
+  },
+  {
+    letter: 'C',
+    correctImage: '/images/cat.png',
+    options: ['/images/monkey.png', '/images/banana.png', '/images/lion.png']
+  },
 ];
 
 export default function LetterMatchGame({ onAnswer, onGameEnd }) {
