@@ -171,7 +171,7 @@ export default function TeamSetup({ onStart }) {
         <div className="mt-8 flex justify-between">
           {/* Button to return to main page */}
           <button
-            onClick={() => router.push('/games')} // Go to the main game selection page
+            onClick={() => router.push('../components/GameContainer.js')} // Go to the main game selection page
             className="bg-gray-300 text-black py-2 px-4 rounded-lg hover:bg-gray-400 transition-all"
           >
             Back to Game Selection
