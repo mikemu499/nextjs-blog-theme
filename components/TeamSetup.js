@@ -8,8 +8,8 @@ const fruitAvatars = ['🍎', '🍌', '🍓', '🍍', '🍊', '🍉', '🍇', '�
 
 export default function TeamSetup({ onStart }) {
   const [teams, setTeams] = useState({
-    A: { name: 'Apples', avatar: '🍎', category: 'fruits' },
-    B: { name: 'Bananas', avatar: '🍌', category: 'fruits' }
+    A: {  avatar: '🍎', category: 'fruits' },
+    B: {  avatar: '🍌', category: 'fruits' }
   });
 
   const handleStart = () => {
