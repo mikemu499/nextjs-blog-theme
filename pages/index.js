@@ -1,21 +1,21 @@
-import Head from 'next/head';
-import dynamic from 'next/dynamic'; 
+'use client'; // Enable interactivity
 import { useState } from 'react';
 import LetterMatchGame from '@/components/LetterMatchGame';
 
-const GameContainer = dynamic(() => import('../components/GameContainer'), { ssr: false });
 export default function Home() {
-   const [teamAScore, setTeamAScore] = useState(0);
+  const [teamAScore, setTeamAScore] = useState(0);
   const [teamBScore, setTeamBScore] = useState(0);
-  const [currentGame, setCurrentGame] = useState(null); // Removed type annotation
+  const [currentGame, setCurrentGame] = useState(null); // Tracks the active game
+  const [selectedTeam, setSelectedTeam] = useState('A'); // Tracks the selected team
 
+  // Function to update scores
   const updateScore = (team, points) => {
     if (team === 'A') setTeamAScore(prev => prev + points);
     else setTeamBScore(prev => prev + points);
   };
+
   return (
-'use client';
-    <div className="min-h-screen bg-blue-50 p-8 font-['Comic_Neue']">
+    <div className="min-h-screen bg-blue-50 p-8 font-comic-neue">
       {/* Header */}
       <header className="text-center mb-12">
         <h1 className="text-4xl md:text-6xl font-bold text-purple-600 mb-4">
@@ -23,6 +23,7 @@ export default function Home() {
         </h1>
         <p className="text-xl text-gray-700">Learn English with Team Games!</p>
       </header>
+
       {/* Scoreboard */}
       <div className="flex flex-col md:flex-row justify-center gap-8 mb-16">
         <TeamScore 
@@ -38,6 +39,7 @@ export default function Home() {
           color="bg-yellow-200"
         />
       </div>
+
       {/* Game Selection or Active Game */}
       {!currentGame ? (
         // Show game selection grid
@@ -62,14 +64,14 @@ export default function Home() {
           {currentGame === 'letter-match' && (
             <LetterMatchGame 
               onAddPoints={(points) => {
-                // Update scores based on selected team
-                // You'll need to track which team is playing
-                updateScore('A', points); // Or 'B' - implement team selection logic
+                // Update scores based on the selected team
+                updateScore(selectedTeam, points);
               }}
             />
           )}
         </div>
       )}
+
       {/* Footer */}
       <footer className="mt-16 text-center text-gray-600">
         <p>Made with ❤️ by [Your Name]</p>
