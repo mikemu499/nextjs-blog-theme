@@ -1,15 +1,20 @@
 'use client';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/router'; // Import useRouter for navigation
 
-// Define avatars in two categories
+// Define avatars in different categories
 const animalAvatars = ['🐶', '🐱', '🦁', '🐯', '🐻', '🐼', '🐨', '🦄'];
 const fruitAvatars = ['🍎', '🍌', '🍓', '🍍', '🍊', '🍉', '🍇', '🍒'];
+const spaceAvatars = ['🚀', '🪐', '👽', '🌕', '🌌', '🛸', '🌠', '🪐'];
+const sportsAvatars = ['⚽', '🏀', '🏈', '🏐', '🎾', '🏓', '🏸', '🥇'];
+const foodAvatars = ['🍕', '🍔', '🍟', '🍩', '🌭', '🍣', '🍪', '🥞'];
 
 export default function TeamSetup({ onStart }) {
+  const router = useRouter(); // Initialize useRouter hook for navigation
   const [teams, setTeams] = useState({
-    A: {  avatar: '🍎', category: 'fruits' },
-    B: {  avatar: '🍌', category: 'fruits' }
+    A: { name: 'Apples', avatar: '🍎', category: 'fruits' },
+    B: { name: 'Bananas', avatar: '🍌', category: 'fruits' }
   });
 
   const handleStart = () => {
@@ -20,13 +25,83 @@ export default function TeamSetup({ onStart }) {
   const handleCategoryChange = (team, category) => {
     setTeams(prev => ({
       ...prev,
-      [team]: { ...prev[team], category, avatar: category === 'animals' ? animalAvatars[0] : fruitAvatars[0] }
+      [team]: { ...prev[team], category, avatar: getAvatars(category)[0] }
     }));
   };
 
   // Get avatars based on selected category
   const getAvatars = (category) => {
-    return category === 'animals' ? animalAvatars : fruitAvatars;
+    switch (category) {
+      case 'animals':
+        return animalAvatars;
+      case 'fruits':
+        return fruitAvatars;
+      case 'space':
+        return spaceAvatars;
+      case 'sports':
+        return sportsAvatars;
+      case 'foods':
+        return foodAvatars;
+      default:
+        return fruitAvatars; // Default to fruits
+    }
+  };
+
+  // Get name for avatar (used for autofill)
+  const getNameFromAvatar = (avatar, category) => {
+    const nameMap = {
+      animals: {
+        '🐶': 'Dog',
+        '🐱': 'Cat',
+        '🦁': 'Lion',
+        '🐯': 'Tiger',
+        '🐻': 'Bear',
+        '🐼': 'Panda',
+        '🐨': 'Koala',
+        '🦄': 'Unicorn',
+      },
+      fruits: {
+        '🍎': 'Apple',
+        '🍌': 'Banana',
+        '🍓': 'Strawberry',
+        '🍍': 'Pineapple',
+        '🍊': 'Orange',
+        '🍉': 'Watermelon',
+        '🍇': 'Grapes',
+        '🍒': 'Cherry',
+      },
+      space: {
+        '🚀': 'Rocket',
+        '🪐': 'Planet',
+        '👽': 'Alien',
+        '🌕': 'Moon',
+        '🌌': 'Galaxy',
+        '🛸': 'UFO',
+        '🌠': 'Shooting Star',
+        '🪐': 'Asteroid',
+      },
+      sports: {
+        '⚽': 'Soccer Ball',
+        '🏀': 'Basketball',
+        '🏈': 'Football',
+        '🏐': 'Volleyball',
+        '🎾': 'Tennis',
+        '🏓': 'Ping Pong',
+        '🏸': 'Badminton',
+        '🥇': 'Gold Medal',
+      },
+      foods: {
+        '🍕': 'Pizza',
+        '🍔': 'Burger',
+        '🍟': 'Fries',
+        '🍩': 'Donut',
+        '🌭': 'Hot Dog',
+        '🍣': 'Sushi',
+        '🍪': 'Cookie',
+        '🥞': 'Pancakes',
+      },
+    };
+    return nameMap[category][avatar] || '';
   };
 
   return (
@@ -64,6 +139,9 @@ export default function TeamSetup({ onStart }) {
                 >
                   <option value="animals">Animals</option>
                   <option value="fruits">Fruits</option>
+                  <option value="space">Space</option>
+                  <option value="sports">Sports</option>
+                  <option value="foods">Foods</option>
                 </select>
               </div>
 
@@ -74,7 +152,7 @@ export default function TeamSetup({ onStart }) {
                     key={avatar}
                     onClick={() => setTeams(prev => ({
                       ...prev,
-                      [team]: { ...prev[team], avatar }
+                      [team]: { ...prev[team], avatar, name: getNameFromAvatar(avatar, teams[team].category) }
                     }))}
                     className={`text-2xl p-2 rounded-lg transition-all ${
                       teams[team].avatar === avatar 
@@ -90,12 +168,23 @@ export default function TeamSetup({ onStart }) {
           ))}
         </div>
 
-        <button
-          onClick={handleStart}
-          className="mt-8 w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-all"
-        >
-          Start Game!
-        </button>
+        <div className="mt-8 flex justify-between">
+          {/* Button to return to main page */}
+          <button
+            onClick={() => router.push('/')} // Go to the main page or game selection page
+            className="bg-gray-300 text-black py-2 px-4 rounded-lg hover:bg-gray-400 transition-all"
+          >
+            Back to Main Menu
+          </button>
+
+          {/* Start Game Button */}
+          <button
+            onClick={handleStart}
+            className="bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-all"
+          >
+            Start Game!
+          </button>
+        </div>
       </motion.div>
     </div>
   );
