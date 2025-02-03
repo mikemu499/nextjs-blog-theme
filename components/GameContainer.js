@@ -6,10 +6,10 @@ export default function Home() {
   const [teamBScore, setTeamBScore] = useState(0);
 
   // Update scores
-  const updateScore = (team: 'A' | 'B', points: number) => {
-    if (team === 'A') setTeamAScore(prev => prev + points);
-    else setTeamBScore(prev => prev + points);
-  };
+ const updateScore = (team, points) => {
+  if (team === 'A') setTeamAScore(prev => prev + points);
+  else setTeamBScore(prev => prev + points);
+};
 
   return (
     <div className="min-h-screen bg-blue-50 p-8 font-['Comic_Neue']">
