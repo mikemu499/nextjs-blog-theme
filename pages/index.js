@@ -5,28 +5,7 @@ import LetterMatchGame from '@/components/LetterMatchGame';
 
 const GameContainer = dynamic(() => import('../components/GameContainer'), { ssr: false });
 export default function Home() {
-  return (
-    <>
-      {/* Add metadata for SEO */}
-    <div className="flex flex-col items-center justify-center">
-      <Head>
-        <title>Phonics Adventure</title>
-        <meta name="description" content="A fun and interactive phonics learning game for preschoolers!" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
- </div>
-      {/* Main Game Content */}
-   <div className="flex flex-col min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/images/background.jpg')" }}>
-            <h1 className="text-5xl font-bold text-green-500 mb-8 drop-shadow-lg">Phonics Adventure!</h1>
-            <GameContainer />
-        </div>
-    </>
-  );
-}
-'use client';
-
-export default function Home() {
-  const [teamAScore, setTeamAScore] = useState(0);
+   const [teamAScore, setTeamAScore] = useState(0);
   const [teamBScore, setTeamBScore] = useState(0);
   const [currentGame, setCurrentGame] = useState(null); // Removed type annotation
 
@@ -34,8 +13,8 @@ export default function Home() {
     if (team === 'A') setTeamAScore(prev => prev + points);
     else setTeamBScore(prev => prev + points);
   };
-
   return (
+'use client';
     <div className="min-h-screen bg-blue-50 p-8 font-['Comic_Neue']">
       {/* Header */}
       <header className="text-center mb-12">
