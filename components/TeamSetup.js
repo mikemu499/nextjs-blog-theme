@@ -113,7 +113,7 @@ export default function TeamSetup({ onStart }) {
       >
         <h1 className="text-3xl font-bold text-center mb-8">Create Your Teams!</h1>
         
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-8">
           {['A', 'B'].map((team) => (
             <div key={team} className="space-y-4">
               <h2 className="text-xl font-semibold">Team {team}</h2>
@@ -171,10 +171,10 @@ export default function TeamSetup({ onStart }) {
         <div className="mt-8 flex justify-between">
           {/* Button to return to main page */}
           <button
-            onClick={() => router.push('/')} // Go to the main page or game selection page
+            onClick={() => router.push('/games')} // Go to the main game selection page
             className="bg-gray-300 text-black py-2 px-4 rounded-lg hover:bg-gray-400 transition-all"
           >
-            Back to Main Menu
+            Back to Game Selection
           </button>
 
           {/* Start Game Button */}
