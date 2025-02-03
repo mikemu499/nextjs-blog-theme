@@ -1,78 +1,75 @@
-// components/LetterMatchGame.js
 'use client';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
-export default function LetterMatchGame({ teamA, teamB, onAddPoints }) {
-  const [currentPair, setCurrentPair] = useState(phonicsPairs[0]);
-  const [selectedTeam, setSelectedTeam] = useState(null);
-  const [feedback, setFeedback] = useState('');
+const phonicsPairs = [
+  {
+    letter: 'A',
+    correctImage: '/images/apple.png',
+    options: ['/images/apple.png', '/images/ball.png', '/images/cat.png']
+  },
+  // Add more pairs...
+];
 
-  // New game state
-  const [gameState, setGameState] = useState({
-    attempts: 0,
-    correct: 0,
-    streak: 0
-  });
+export default function LetterMatchGame({ onAnswer, onGameEnd }) {
+  const [currentPair, setCurrentPair] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
 
-  // Improved answer handling
-  const handleAnswer = (isCorrect) => {
-    if (isCorrect) {
-      onAddPoints(selectedTeam, 10 + gameState.streak * 2);
-      setGameState(prev => ({
-        ...prev,
-        correct: prev.correct + 1,
-        streak: prev.streak + 1
-      }));
-      setFeedback('🎉 Correct!');
-    } else {
-      setGameState(prev => ({
-        ...prev,
-        streak: 0
-      }));
-      setFeedback('💡 Try again!');
-    }
+  useEffect(() => {
+    newRound();
+  }, []);
 
-    // Auto-advance after 1.5s
+  const newRound = () => {
+    setSelectedOption(null);
+    setCurrentPair(phonicsPairs[Math.floor(Math.random() * phonicsPairs.length)]);
+  };
+
+  const handleSelect = (option) => {
+    if (selectedOption) return;
+    
+    setSelectedOption(option);
+    const isCorrect = option === currentPair.correctImage;
+    onAnswer(isCorrect);
+
     setTimeout(() => {
-      setCurrentPair(getRandomPair());
-      setFeedback('');
+      if (isCorrect) newRound();
     }, 1500);
   };
 
-  return (
-    <div className="text-center">
-      {/* Team Indicators */}
-      <div className="flex justify-between mb-8">
-        <div className="text-2xl">
-          {teamB.avatar} {teamB.name}
-        </div>
-        <div className="text-2xl">
-          {teamA.avatar} {teamA.name}
-        </div>
-      </div>
+  if (!currentPair) return null;
 
-      {/* Game Content */}
-      <div className="text-9xl font-bold my-8">{currentPair.letter}</div>
-      
-      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-        {shuffledOptions.map((option, index) => (
-          <button
+  return (
+    <div className="max-w-2xl mx-auto">
+      <motion.div 
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        className="text-center mb-8"
+      >
+        <div className="text-9xl font-bold text-purple-600 mb-8">
+          {currentPair.letter}
+        </div>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {currentPair.options.map((option, index) => (
+          <motion.button
             key={index}
-            onClick={() => handleAnswer(option === currentPair.correctImage)}
-            className={`p-4 rounded-xl transition-all ${
-              feedback ? 
-                (option === currentPair.correctImage ? 'bg-green-200' : 'bg-red-200') 
-                : 'bg-white hover:bg-blue-50'
+            onClick={() => handleSelect(option)}
+            disabled={!!selectedOption}
+            whileHover={{ scale: 1.05 }}
+            className={`p-4 rounded-xl border-4 ${
+              selectedOption === option 
+                ? (option === currentPair.correctImage ? 'border-green-500' : 'border-red-500')
+                : 'border-gray-200'
             }`}
           >
-            <img src={option} className="h-32 w-full object-contain" />
-          </button>
+            <img 
+              src={option} 
+              alt="Option" 
+              className="w-full h-32 object-contain" 
+            />
+          </motion.button>
         ))}
-      </div>
-
-      {/* Feedback & Stats */}
-      <div className="mt-6 text-xl font-bold text-blue-600">
-        {feedback || `Streak: ${gameState.streak} ✨`}
       </div>
     </div>
   );
