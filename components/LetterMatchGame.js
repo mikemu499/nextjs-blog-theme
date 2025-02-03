@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-
 // Phonics data (add more entries as needed)
 const phonicsPairs = [
   {
