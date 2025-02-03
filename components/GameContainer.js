@@ -1,227 +1,98 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+'use client'; // Enable interactivity
+import { useState } from 'react';
 
-// All 44 phonics sounds
-const letters = [
-    { letter: "A", symbol: "/æ/", sound: "https://www.soundjay.com/voice/sounds/a-1.mp3", example: "Apple", image: "/images/apple.png" },
-    { letter: "B", symbol: "/b/", sound: "https://www.soundjay.com/voice/sounds/b-1.mp3", example: "Ball", image: "/images/ball.png" },
-    { letter: "C", symbol: "/k/", sound: "https://www.soundjay.com/voice/sounds/c-1.mp3", example: "Cat", image: "/images/cat.png" },
-    { letter: "D", symbol: "/d/", sound: "https://www.soundjay.com/voice/sounds/d-1.mp3", example: "Dog", image: "/images/dog.png" },
-    // Add all 44 sounds here...
-];
+export default function Home() {
+  const [teamAScore, setTeamAScore] = useState(0);
+  const [teamBScore, setTeamBScore] = useState(0);
 
-// Team icons (fruits and animals)
-const teamIcons = [
-    { name: "Monkey", image: "/images/monkey.png" },
-    { name: "Lion", image: "/images/lion.png" },
-    { name: "Elephant", image: "/images/elephant.png" },
-    { name: "Tiger", image: "/images/tiger.png" },
-    { name: "Banana", image: "/images/banana.png" },
-    { name: "Apple", image: "/images/apple.png" },
-    // Add more icons as needed...
-];
+  // Update scores
+  const updateScore = (team: 'A' | 'B', points: number) => {
+    if (team === 'A') setTeamAScore(prev => prev + points);
+    else setTeamBScore(prev => prev + points);
+  };
 
-export default function GameContainer() {
-    const [currentQuestion, setCurrentQuestion] = useState(null);
-    const [teamScores, setTeamScores] = useState({ team1: 0, team2: 0 });
-    const [currentTeam, setCurrentTeam] = useState(1);
-    const [feedback, setFeedback] = useState('');
-    const [showNextButton, setShowNextButton] = useState(false);
-    const [selectedIcons, setSelectedIcons] = useState({ team1: null, team2: null });
-    const [isGameStarted, setIsGameStarted] = useState(false);
+  return (
+    <div className="min-h-screen bg-blue-50 p-8 font-['Comic_Neue']">
+      {/* Header */}
+      <header className="text-center mb-12">
+        <h1 className="text-4xl md:text-6xl font-bold text-purple-600 mb-4">
+          🎮 Phonics Playground
+        </h1>
+        <p className="text-xl text-gray-700">Learn English with Team Games!</p>
+      </header>
 
-    useEffect(() => {
-        if (isGameStarted) loadQuestion();
-    }, [isGameStarted]);
+      {/* Scoreboard */}
+      <div className="flex flex-col md:flex-row justify-center gap-8 mb-16">
+        <TeamScore 
+          name="Team Apples 🍎" 
+          score={teamAScore} 
+          onAddPoints={() => updateScore('A', 10)}
+          color="bg-red-200"
+        />
+        <TeamScore 
+          name="Team Bananas 🍌" 
+          score={teamBScore} 
+          onAddPoints={() => updateScore('B', 10)}
+          color="bg-yellow-200"
+        />
+      </div>
 
-    const loadQuestion = () => {
-        const question = letters[Math.floor(Math.random() * letters.length)];
-        setCurrentQuestion(question);
-        setFeedback('');
-        setShowNextButton(false);
+      {/* Game Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <GameCard
+          title="Letter Match"
+          description="Match letters to sounds!"
+          image="/phonics-match.png"
+        />
+        <GameCard
+          title="Word Blast"
+          description="Pop phonics balloons!"
+          image="/word-blast.png"
+        />
+        {/* Add more games */}
+      </div>
 
-        if (typeof window !== 'undefined') {
-            const audio = new Audio(question.sound);
-            audio.play().catch((error) => {
-                console.error("Audio playback failed:", error);
-            });
-        }
-    };
-
-    const handleAnswer = (selectedOption) => {
-        const buttons = document.querySelectorAll('.option-button');
-        buttons.forEach(button => button.disabled = true);
-
-        if (selectedOption === currentQuestion.example) {
-            setFeedback(
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="flex flex-col items-center"
-                >
-                    <p className="text-2xl text-green-500 font-bold">Correct!</p>
-                    <img src="/images/correct.gif" alt="Correct GIF" className="w-24 mt-4" />
-                </motion.div>
-            );
-            setTeamScores(prev => ({ ...prev, [`team${currentTeam}`]: prev[`team${currentTeam}`] + 1 }));
-        } else {
-            setFeedback(
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="flex flex-col items-center"
-                >
-                    <p className="text-2xl text-red-500 font-bold">Wrong! The correct answer is {currentQuestion.example}.</p>
-                    <img src="/images/wrong.gif" alt="Wrong GIF" className="w-24 mt-4" />
-                </motion.div>
-            );
-        }
-        setShowNextButton(true);
-    };
-
-    const nextQuestion = () => {
-        setCurrentTeam(currentTeam === 1 ? 2 : 1);
-        loadQuestion();
-    };
-
-    const startGame = () => {
-        if (selectedIcons.team1 && selectedIcons.team2) {
-            setIsGameStarted(true);
-        } else {
-            alert("Both teams must select an icon before starting the game!");
-        }
-    };
-
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/images/background.jpg')" }}>
-            {/* Floating Team Selection Modal */}
-            {!isGameStarted && (
-                <motion.div
-                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                >
-                    <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
-                        <h2 className="text-3xl font-bold text-blue-500 mb-6">Choose Your Team Icons</h2>
-                        <div className="flex justify-between mb-6">
-                            <div>
-                                <h3 className="text-xl font-bold text-green-500 mb-2">Team 1</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {teamIcons.map((icon, index) => (
-                                        <button
-                                            key={index}
-                                            className={`w-20 h-20 rounded-full overflow-hidden border-4 ${selectedIcons.team1 === icon.name ? 'border-green-500' : 'border-transparent'}`}
-                                            onClick={() => setSelectedIcons(prev => ({ ...prev, team1: icon.name }))}
-                                        >
-                                            <img src={icon.image} alt={icon.name} className="w-full h-full object-cover" />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-red-500 mb-2">Team 2</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {teamIcons.map((icon, index) => (
-                                        <button
-                                            key={index}
-                                            className={`w-20 h-20 rounded-full overflow-hidden border-4 ${selectedIcons.team2 === icon.name ? 'border-red-500' : 'border-transparent'}`}
-                                            onClick={() => setSelectedIcons(prev => ({ ...prev, team2: icon.name }))}
-                                        >
-                                            <img src={icon.image} alt={icon.name} className="w-full h-full object-cover" />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                        <button
-                            className="bg-blue-500 text-white text-lg font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition-colors duration-300"
-                            onClick={startGame}
-                        >
-                            Start Game
-                        </button>
-                    </div>
-                </motion.div>
-            )}
-
-            {/* Main Game Layout */}
-            {isGameStarted && (
-                <div className="relative flex flex-col items-center justify-center w-full h-full">
-                    {/* Team Icons and Scores */}
-                    <div className="absolute top-4 left-4 flex flex-col items-center">
-                        <img src={teamIcons.find(icon => icon.name === selectedIcons.team1)?.image} alt="Team 1 Icon" className="w-20 h-20 rounded-full mb-2" />
-                        <p className="text-xl font-bold text-green-500">Team 1</p>
-                        <p className="text-2xl font-bold text-orange-500">{teamScores.team1}</p>
-                    </div>
-                    <div className="absolute top-4 right-4 flex flex-col items-center">
-                        <img src={teamIcons.find(icon => icon.name === selectedIcons.team2)?.image} alt="Team 2 Icon" className="w-20 h-20 rounded-full mb-2" />
-                        <p className="text-xl font-bold text-red-500">Team 2</p>
-                        <p className="text-2xl font-bold text-orange-500">{teamScores.team2}</p>
-                    </div>
-
-                    {/* Game Content */}
-                    <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 w-full max-w-2xl h-[80vh] overflow-y-auto text-center">
-                        <motion.div
-                            className="text-7xl font-bold text-orange-500 mb-6 drop-shadow-md"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: 'spring', stiffness: 100 }}
-                        >
-                            {currentQuestion?.letter}
-                        </motion.div>
-                        <div className="text-xl text-blue-500 mb-4">{currentQuestion?.symbol}</div>
-                        {currentQuestion && (
-                            <motion.img
-                                src={currentQuestion.image}
-                                alt={currentQuestion.example}
-                                className="w-40 h-auto mx-auto mb-6"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5, delay: 0.2 }}
-                            />
-                        )}
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                            {currentQuestion &&
-                                getRandomOptions(currentQuestion.example).map((option, index) => (
-                                    <motion.button
-                                        key={index}
-                                        className="bg-yellow-500 text-white text-xl font-bold py-4 px-6 rounded-xl shadow-md hover:bg-yellow-600 transition-transform duration-300 ease-in-out hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                                        onClick={() => handleAnswer(option)}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                    >
-                                        {option}
-                                    </motion.button>
-                                ))}
-                        </div>
-                        <div className="mt-4">{feedback}</div>
-                        {showNextButton && (
-                            <motion.button
-                                id="next-btn"
-                                onClick={nextQuestion}
-                                className="mt-4 bg-blue-500 text-white text-lg font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition-colors duration-300"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                Next Question
-                            </motion.button>
-                        )}
-                    </div>
-                </div>
-            )}
-        </div>
-    );
+      {/* Footer */}
+      <footer className="mt-16 text-center text-gray-600">
+        <p>Made with ❤️ by [Your Name]</p>
+      </footer>
+    </div>
+  );
 }
 
-function getRandomOptions(correctAnswer) {
-    const options = [correctAnswer];
-    while (options.length < 2) {
-        const randomOption = letters[Math.floor(Math.random() * letters.length)].example;
-        if (!options.includes(randomOption)) {
-            options.push(randomOption);
-        }
-    }
-    return options.sort(() => Math.random() - 0.5);
-}
+// Reusable Team Score Component
+const TeamScore = ({ name, score, onAddPoints, color }: { 
+  name: string, 
+  score: number, 
+  onAddPoints: () => void,
+  color: string 
+}) => (
+  <div className={`${color} p-6 rounded-xl shadow-lg text-center`}>
+    <h2 className="text-2xl font-semibold mb-4">{name}</h2>
+    <div className="text-5xl font-bold mb-4">{score}</div>
+    <button 
+      onClick={onAddPoints}
+      className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full transition-all"
+    >
+      +10 Points
+    </button>
+  </div>
+);
+
+// Reusable Game Card Component
+const GameCard = ({ title, description, image }: { 
+  title: string, 
+  description: string, 
+  image: string 
+}) => (
+  <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+    <img src={image} alt={title} className="w-full h-48 object-cover" />
+    <div className="p-6">
+      <h3 className="text-xl font-bold mb-2">{title}</h3>
+      <p className="text-gray-600 mb-4">{description}</p>
+      <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+        Play Now →
+      </button>
+    </div>
+  </div>
+);
