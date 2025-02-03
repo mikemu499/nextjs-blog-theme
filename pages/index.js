@@ -1,17 +1,19 @@
-'use client'; // Enable interactivity
+'use client';
 import { useState } from 'react';
-import LetterMatchGame from '../components/LetterMatchGame'; // Relative path
+import LetterMatchGame from '../components/LetterMatchGame';
 
 export default function Home() {
   const [teamAScore, setTeamAScore] = useState(0);
   const [teamBScore, setTeamBScore] = useState(0);
-  const [currentGame, setCurrentGame] = useState(null); // Tracks the active game
-  const [selectedTeam, setSelectedTeam] = useState('A'); // Tracks the selected team
+  const [currentGame, setCurrentGame] = useState(null);
+  const [selectedTeam, setSelectedTeam] = useState('A');
 
-  // Function to update scores
   const updateScore = (team, points) => {
-    if (team === 'A') setTeamAScore(prev => prev + points);
-    else setTeamBScore(prev => prev + points);
+    if (team === 'A') {
+      setTeamAScore(prev => prev + points);
+    } else {
+      setTeamBScore(prev => prev + points);
+    }
   };
 
   return (
@@ -29,20 +31,21 @@ export default function Home() {
         <TeamScore 
           name="Team Apples 🍎" 
           score={teamAScore} 
-          onAddPoints={() => updateScore('A', 10)}
           color="bg-red-200"
+          isSelected={selectedTeam === 'A'}
+          onSelect={() => setSelectedTeam('A')}
         />
         <TeamScore 
           name="Team Bananas 🍌" 
-          score={teamBScore} 
-          onAddPoints={() => updateScore('B', 10)}
+          score={teamBScore}
           color="bg-yellow-200"
+          isSelected={selectedTeam === 'B'}
+          onSelect={() => setSelectedTeam('B')}
         />
       </div>
 
-      {/* Game Selection or Active Game */}
+      {/* Game Content */}
       {!currentGame ? (
-        // Show game selection grid
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           <GameCard
             title="Letter Match"
@@ -50,10 +53,8 @@ export default function Home() {
             image="/phonics-match.png"
             onPlay={() => setCurrentGame('letter-match')}
           />
-          {/* Add more games here */}
         </div>
       ) : (
-        // Show selected game
         <div className="max-w-4xl mx-auto">
           <button 
             onClick={() => setCurrentGame(null)}
@@ -63,16 +64,12 @@ export default function Home() {
           </button>
           {currentGame === 'letter-match' && (
             <LetterMatchGame 
-              onAddPoints={(points) => {
-                // Update scores based on the selected team
-                updateScore(selectedTeam, points);
-              }}
+              onAddPoints={(points) => updateScore(selectedTeam, points)}
             />
           )}
         </div>
       )}
 
-      {/* Footer */}
       <footer className="mt-16 text-center text-gray-600">
         <p>Made with ❤️ by [Your Name]</p>
       </footer>
@@ -80,22 +77,23 @@ export default function Home() {
   );
 }
 
-// Reusable Team Score Component
-const TeamScore = ({ name, score, onAddPoints, color }) => (
-  <div className={`${color} p-6 rounded-xl shadow-lg text-center`}>
+// Updated TeamScore Component with Team Selection
+const TeamScore = ({ name, score, color, isSelected, onSelect }) => (
+  <div className={`${color} p-6 rounded-xl shadow-lg text-center transition-transform ${isSelected ? 'scale-105' : ''}`}>
     <h2 className="text-2xl font-semibold mb-4">{name}</h2>
     <div className="text-5xl font-bold mb-4">{score}</div>
     <button 
-      onClick={onAddPoints}
-      className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full transition-all"
-      aria-label={`Add 10 points to ${name}`}
+      onClick={onSelect}
+      className={`${
+        isSelected ? 'bg-green-600' : 'bg-green-500'
+      } hover:bg-green-700 text-white px-6 py-2 rounded-full transition-all`}
     >
-      +10 Points
+      {isSelected ? 'Selected!' : 'Select Team'}
     </button>
   </div>
 );
 
-// Reusable Game Card Component
+// GameCard Component
 const GameCard = ({ title, description, image, onPlay }) => (
   <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow">
     <img src={image} alt={title} className="w-full h-48 object-cover" />
@@ -104,7 +102,7 @@ const GameCard = ({ title, description, image, onPlay }) => (
       <p className="text-gray-600 mb-4">{description}</p>
       <button 
         onClick={onPlay}
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full"
       >
         Play Now →
       </button>
