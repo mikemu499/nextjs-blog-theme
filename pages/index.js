@@ -1,6 +1,6 @@
 'use client'; // Enable interactivity
 import { useState } from 'react';
-import LetterMatchGame from '@/components/LetterMatchGame';
+import LetterMatchGame from '../components/LetterMatchGame'; // Relative path
 
 export default function Home() {
   const [teamAScore, setTeamAScore] = useState(0);
