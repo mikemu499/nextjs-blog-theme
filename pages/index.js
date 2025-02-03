@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSound } from 'use-sound';
-import TeamSetup from '@/components/TeamSetup';
-import ProgressBar from '@/components/ProgressBar';
-import Confetti from '@/components/Confetti';
+import TeamSetup from '../components/TeamSetup';
+import ProgressBar from '../components/ProgressBar';
+import Confetti from '../components/Confetti';
 
 // Lazy load game component
 const LetterMatchGame = dynamic(() => import('@/components/LetterMatchGame'), {
