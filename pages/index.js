@@ -1,111 +1,108 @@
 'use client';
-import { useState } from 'react';
-import LetterMatchGame from '../components/LetterMatchGame';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useSound } from 'use-sound';
+import TeamSetup from '@/components/TeamSetup';
+import ProgressBar from '@/components/ProgressBar';
+import Confetti from '@/components/Confetti';
+
+// Lazy load game component
+const LetterMatchGame = dynamic(() => import('@/components/LetterMatchGame'), {
+  loading: () => <p>Loading game...</p>,
+});
 
 export default function Home() {
-  const [teamAScore, setTeamAScore] = useState(0);
-  const [teamBScore, setTeamBScore] = useState(0);
-  const [currentGame, setCurrentGame] = useState(null);
-  const [selectedTeam, setSelectedTeam] = useState('A');
+  // Audio effects
+  const [playCorrect] = useSound('/sounds/correct.mp3');
+  const [playWrong] = useSound('/sounds/wrong.mp3');
+  const [playVictory] = useSound('/sounds/victory.mp3');
 
-  const updateScore = (team, points) => {
-    if (team === 'A') {
-      setTeamAScore(prev => prev + points);
+  // Game state
+  const [teams, setTeams] = useState({
+    A: { name: 'Apples', avatar: '🍎', score: 0 },
+    B: { name: 'Bananas', avatar: '🍌', score: 0 }
+  });
+  const [currentGame, setCurrentGame] = useState(null);
+  const [activeTeam, setActiveTeam] = useState('A');
+  const [showVictory, setShowVictory] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
+
+  // Game timer
+  useEffect(() => {
+    if (currentGame && timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    } else if (timeLeft === 0) {
+      handleGameEnd();
+    }
+  }, [currentGame, timeLeft]);
+
+  const handleGameStart = (teamA, teamB) => {
+    setTeams({
+      A: { ...teamA, score: 0 },
+      B: { ...teamB, score: 0 }
+    });
+    setCurrentGame('letter-match');
+  };
+
+  const handleAnswer = (isCorrect) => {
+    if (isCorrect) {
+      playCorrect();
+      setTeams(prev => ({
+        ...prev,
+        [activeTeam]: {
+          ...prev[activeTeam],
+          score: prev[activeTeam].score + 10
+        }
+      }));
+      setActiveTeam(prev => prev === 'A' ? 'B' : 'A'); // Switch turns
     } else {
-      setTeamBScore(prev => prev + points);
+      playWrong();
     }
   };
 
+  const handleGameEnd = () => {
+    playVictory();
+    setShowVictory(true);
+    setTimeout(() => setCurrentGame(null), 5000);
+  };
+
   return (
-    <div className="min-h-screen bg-blue-50 p-8 font-comic-neue">
-      {/* Header */}
-      <header className="text-center mb-12">
-        <h1 className="text-4xl md:text-6xl font-bold text-purple-600 mb-4">
-          🎮 Phonics Playground
-        </h1>
-        <p className="text-xl text-gray-700">Learn English with Team Games!</p>
-      </header>
-
-      {/* Scoreboard */}
-      <div className="flex flex-col md:flex-row justify-center gap-8 mb-16">
-        <TeamScore 
-          name="Team Apples 🍎" 
-          score={teamAScore} 
-          color="bg-red-200"
-          isSelected={selectedTeam === 'A'}
-          onSelect={() => setSelectedTeam('A')}
-        />
-        <TeamScore 
-          name="Team Bananas 🍌" 
-          score={teamBScore}
-          color="bg-yellow-200"
-          isSelected={selectedTeam === 'B'}
-          onSelect={() => setSelectedTeam('B')}
-        />
-      </div>
-
-      {/* Game Content */}
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-50">
       {!currentGame ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          <GameCard
-            title="Letter Match"
-            description="Match letters to sounds!"
-            image="/phonics-match.png"
-            onPlay={() => setCurrentGame('letter-match')}
-          />
-        </div>
+        <TeamSetup onStart={handleGameStart} />
       ) : (
-        <div className="max-w-4xl mx-auto">
-          <button 
-            onClick={() => setCurrentGame(null)}
-            className="mb-8 text-blue-600 hover:text-blue-700 font-bold"
-          >
-            ← Back to Games
-          </button>
-          {currentGame === 'letter-match' && (
+        <div className="flex flex-col md:flex-row min-h-screen">
+          {/* Left Team */}
+          <TeamPanel team={teams.B} isActive={activeTeam === 'B'} />
+
+          {/* Main Game Area */}
+          <div className="flex-1 p-8">
+            <ProgressBar timeLeft={timeLeft} totalTime={60} />
+            
             <LetterMatchGame 
-              onAddPoints={(points) => updateScore(selectedTeam, points)}
+              onAnswer={handleAnswer}
+              onGameEnd={handleGameEnd}
             />
-          )}
+
+            {showVictory && <Confetti winner={teams.A.score > teams.B.score ? 'A' : 'B'} />}
+          </div>
+
+          {/* Right Team */}
+          <TeamPanel team={teams.A} isActive={activeTeam === 'A'} />
         </div>
       )}
-
-      <footer className="mt-16 text-center text-gray-600">
-        <p>Made with ❤️ by [Your Name]</p>
-      </footer>
     </div>
   );
 }
 
-// Updated TeamScore Component with Team Selection
-const TeamScore = ({ name, score, color, isSelected, onSelect }) => (
-  <div className={`${color} p-6 rounded-xl shadow-lg text-center transition-transform ${isSelected ? 'scale-105' : ''}`}>
-    <h2 className="text-2xl font-semibold mb-4">{name}</h2>
-    <div className="text-5xl font-bold mb-4">{score}</div>
-    <button 
-      onClick={onSelect}
-      className={`${
-        isSelected ? 'bg-green-600' : 'bg-green-500'
-      } hover:bg-green-700 text-white px-6 py-2 rounded-full transition-all`}
-    >
-      {isSelected ? 'Selected!' : 'Select Team'}
-    </button>
-  </div>
-);
-
-// GameCard Component
-const GameCard = ({ title, description, image, onPlay }) => (
-  <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow">
-    <img src={image} alt={title} className="w-full h-48 object-cover" />
-    <div className="p-6">
-      <h3 className="text-xl font-bold mb-2">{title}</h3>
-      <p className="text-gray-600 mb-4">{description}</p>
-      <button 
-        onClick={onPlay}
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full"
-      >
-        Play Now →
-      </button>
-    </div>
+const TeamPanel = ({ team, isActive }) => (
+  <div className={`md:w-64 p-4 transition-all ${isActive ? 'bg-white shadow-xl' : 'bg-gray-50'}`}>
+    <div className="text-4xl mb-2">{team.avatar}</div>
+    <h2 className="text-2xl font-bold mb-2">{team.name}</h2>
+    <div className="text-5xl font-bold text-purple-600">{team.score}</div>
+    <div className={`mt-2 h-2 ${isActive ? 'bg-green-500' : 'bg-transparent'}`} />
   </div>
 );
